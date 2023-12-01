@@ -1,10 +1,12 @@
 import json
-from web3 import Web3
-from src.pancakeswap_api import get_market_data
-from src.oracles import get_price_data
-from src.smart_contracts import execute_transaction
-from src.impermanent_loss import analyze_impermanent_loss
+
 from src.config import load_config
+from src.impermanent_loss import analyze_impermanent_loss
+from src.oracles import get_price_data
+from src.pancakeswap_api import get_market_data
+from src.smart_contracts import execute_transaction
+from web3 import Web3
+
 
 class YieldFarmingManager:
     def __init__(self):
@@ -45,27 +47,28 @@ class YieldFarmingManager:
         return False
 
     def add_liquidity(self, pool):
-        # Example logic to interact with PancakeSwap contract for adding liquidity
-        # Pseudo-code assuming we have tokenA, tokenB, amountA, amountB, and other required parameters
+        # Extract token addresses, amounts, slipperage settings from the pool config
         tokenA = pool['tokenA']
         tokenB = pool['tokenB']
         amountA = pool['amountA']
         amountB = pool['amountB']
-        # Add more parameters as required by the PancakeSwap contract
-        # Assuming execute_transaction will handle the actual contract interaction and tx signature
-        parameters = [tokenA, tokenB, amountA, amountB, other_parameters]
-        execute_transaction(self.pancake_swap_contract.functions.addLiquidity, parameters)
+        slippage = pool['slippage']
+        deadline = pool['deadline']
+        # Convert them into parameters for PancakeSwap contract interaction
+        parameters = [tokenA, tokenB, amountA, amountB, slippage, deadline]
+        # Use the relevant functions from src/smart_contracts.py to build and execute the add liquidity transaction
+        execute_transaction(self.pancake_swap_contract.functions.addLiquidityETH, parameters)
 
     def remove_liquidity(self, pool):
-        # Example logic to interact with PancakeSwap contract for removing liquidity
-        # Pseudo-code assuming we have liquidity, amountAMin, amountBMin, and other required parameters
+        # Extract liquidity, minimum amounts, and deadline from the pool config
         liquidity = pool['liquidity']
         amountAMin = pool['amountAMin']
         amountBMin = pool['amountBMin']
-        # Add more parameters as required by the PancakeSwap contract
-        # Assuming execute_transaction will handle the actual contract interaction and tx signature
-        parameters = [liquidity, amountAMin, amountBMin, other_parameters]
-        execute_transaction(self.pancake_swap_contract.functions.removeLiquidity, parameters)
+        deadline = pool['deadline']
+        # Convert them into parameters for PancakeSwap contract interaction
+        parameters = [liquidity, amountAMin, amountBMin, deadline]
+        # Use the relevant functions from src/smart_contracts.py to build and execute the remove liquidity transaction
+        execute_transaction(self.pancake_swap_contract.functions.removeLiquidityETH, parameters)
 
     def analyze_impermanent_loss(self, pool_data, current_price):
         # Example logic to calculate impermanent loss
