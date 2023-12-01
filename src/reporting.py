@@ -1,6 +1,8 @@
-```python
 import pandas as pd
 from src.config import load_config
+from src.oracles import Oracle
+import sklearn
+import statsmodels.api as sm
 
 class Reporting:
     def __init__(self):
@@ -26,12 +28,27 @@ class Reporting:
         return forecast
 
     def get_historical_data(self, asset):
-        # This function should be implemented to fetch historical data for the given asset
-        pass
+        oracle = Oracle()
+        historical_data = oracle.get_price_data(asset)
+        return historical_data
 
     def train_forecast_model(self, historical_data):
-        # This function should be implemented to train a forecast model using the historical data
-        pass
+        # Placeholder code - actual implementation will depend on the model choice and data specifics
+        # Assuming historical_data is a pandas DataFrame with columns: ['date', 'price']
+        X = historical_data['date'].values.reshape(-1, 1)  # Feature (e.g., dates converted to ordinal)
+        y = historical_data['price'].values  # Target (prices)
+        
+        # Example using sklearn (e.g., linear regression model)
+        from sklearn.linear_model import LinearRegression
+        model = LinearRegression()
+        model.fit(X, y)
+        
+        # Example using statsmodels (e.g., SARIMA model)
+        # import statsmodels.api as sm
+        # model = sm.tsa.statespace.SARIMAX(y, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
+        # model = model.fit()
+
+        return model
 
     def generate_simulation(self, portfolio, simulation_period):
         simulation = {}
@@ -48,4 +65,3 @@ class Reporting:
     def train_simulation_model(self, historical_data):
         # This function should be implemented to train a simulation model using the historical data
         pass
-```
