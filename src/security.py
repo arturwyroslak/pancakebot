@@ -1,4 +1,4 @@
-```python
+python
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 from eth_account import Account
@@ -25,8 +25,18 @@ def check_reentrancy(transaction):
     """
     Function to check for reentrancy attacks.
     """
-    # TODO: Implement reentrancy check logic
-    pass
+    if hasattr(transaction, '_is_executing') and transaction._is_executing:
+        # If a reentrancy call is detected, raise an exception to prevent it
+        raise Exception('Reentrancy detected!')
+    try:
+        # Set the state variable before the function executes
+        transaction._is_executing = True
+        # The original function call
+        # TODO: add the actual transaction function call or logic here
+    finally:
+        # Reset the state variable after the function execution
+        transaction._is_executing = False
+
 
 def check_overflow_underflow(transaction):
     """
@@ -41,4 +51,3 @@ def anonymize_transaction(transaction):
     """
     # TODO: Implement transaction anonymization logic
     pass
-```
