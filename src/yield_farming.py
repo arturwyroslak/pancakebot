@@ -1,4 +1,3 @@
-```python
 import json
 from web3 import Web3
 from src.pancakeswap_api import get_market_data
@@ -25,9 +24,19 @@ class YieldFarmingManager:
             elif self.should_remove_liquidity(pool_data, pool_price):
                 self.remove_liquidity(pool)
 
-    def should_add_liquidity(self, pool_data, pool_price):
-        # Implement your logic to decide when to add liquidity
-        pass
+        def should_add_liquidity(self, pool_data, pool_price):
+            # Here is a pseudo-implementation for deciding when to add liquidity.
+            # Real implementation would involve more detailed analysis of market conditions.
+            stable_price = 1.0  # Hypothetical stable price value
+            high_apy_threshold = 0.05  # Assume 5% APY is considered high
+            acceptable_loss_percentage = 0.10  # Assume up to 10% impermanent loss is acceptable
+            some_significant_deviation_threshold = 0.05  # 5% deviation from stable price is significant
+            price_deviation = abs(pool_price - stable_price) / stable_price
+            is_price_significant = price_deviation > some_significant_deviation_threshold
+            is_apy_high = pool_data['apy'] > high_apy_threshold
+            is_loss_acceptable = pool_data['impermanent_loss'] <= acceptable_loss_percentage
+            # Add liquidity if there is a significant price deviation or high APY and the impermanent loss is acceptable
+            return is_price_significant or (is_apy_high and is_loss_acceptable)
 
     def should_remove_liquidity(self, pool_data, pool_price):
         # Implement your logic to decide when to remove liquidity
@@ -44,4 +53,3 @@ class YieldFarmingManager:
     def analyze_impermanent_loss(self):
         # Implement your logic to analyze and minimize impermanent loss
         pass
-```
