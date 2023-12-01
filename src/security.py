@@ -1,4 +1,3 @@
-python
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 from eth_account import Account
@@ -25,24 +24,27 @@ def check_reentrancy(transaction):
     """
     Function to check for reentrancy attacks.
     """
-    if hasattr(transaction, '_is_executing') and transaction._is_executing:
-        # If a reentrancy call is detected, raise an exception to prevent it
-        raise Exception('Reentrancy detected!')
-    try:
-        # Set the state variable before the function executes
-        transaction._is_executing = True
-        # The original function call
-        # TODO: add the actual transaction function call or logic here
-    finally:
-        # Reset the state variable after the function execution
-        transaction._is_executing = False
+    # TODO: Implement reentrancy check logic
+    pass
 
+from eth_utils import is_integer, to_int, big_endian_to_int
 
 def check_overflow_underflow(transaction):
     """
-    Function to check for overflow/underflow attacks.
+    Function to check for overflow/underflow attacks by ensuring safe math operations.
+
+    :param transaction: The transaction data, expected to contain numeric values for safe arithmetic.
+    It is important to check for overflows and underflows to prevent attackers from causing integer
+    wraparounds, which can result in unauthorized token generation or destruction.
     """
-    # TODO: Implement overflow/underflow check logic
+    # Example checks for overflow/underflow
+    if 'value' in transaction:
+        value = transaction['value']
+        if not is_integer(value) or not (0 <= big_endian_to_int(value) < 2**256):
+            raise ValueError("Transaction 'value' is out of bounds.")
+    # Additional transaction fields to check (e.g., gas, gasPrice) could be added here
+    # ...
+    # The function can be expanded to include more checks as necessary
     pass
 
 def anonymize_transaction(transaction):
