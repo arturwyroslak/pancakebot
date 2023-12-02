@@ -1,4 +1,4 @@
-```python
+from time import time
 from web3 import Web3
 from pancakeswap_api import PancakeSwapAPI
 from config import load_config
@@ -20,15 +20,16 @@ class SmartContracts:
         signed_txn = self.web3.eth.account.signTransaction(transaction, self.config['private_key'])
         return self.web3.eth.sendRawTransaction(signed_txn.rawTransaction)
 
-    def add_liquidity(self, token_address, amount):
-        return self.execute_transaction(self.config['pancake_swap_router_address'], 'addLiquidityETH', token_address, amount, 1, 1, self.config['account_address'], int(time.time()) + 1000)
+    def add_liquidity(self, token_address, amount_token, amount_eth, slippage_tolerance, deadline_offset):
+        deadline = int(time.time()) + deadline_offset
+        return self.execute_transaction(self.config['pancake_swap_router_address'], 'addLiquidityETH', token_address, amount_token, amount_eth, amount_token * (1 - slippage_tolerance), amount_eth * (1 - slippage_tolerance), self.config['account_address'], deadline)
 
-    def remove_liquidity(self, token_address, liquidity):
-        return self.execute_transaction(self.config['pancake_swap_router_address'], 'removeLiquidityETH', token_address, liquidity, 1, 1, self.config['account_address'], int(time.time()) + 1000)
+    def remove_liquidity(self, token_address, liquidity, amount_token_min, amount_eth_min, slippage_tolerance, deadline_offset):
+        deadline = int(time.time()) + deadline_offset
+        return self.execute_transaction(self.config['pancake_swap_router_address'], 'removeLiquidityETH', token_address, liquidity, amount_token_min * (1 - slippage_tolerance), amount_eth_min * (1 - slippage_tolerance), self.config['account_address'], deadline)
 
     def stake(self, pool_address, amount):
         return self.execute_transaction(pool_address, 'stake', amount)
 
     def unstake(self, pool_address, amount):
         return self.execute_transaction(pool_address, 'withdraw', amount)
-```
