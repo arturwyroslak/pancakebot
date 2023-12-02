@@ -1,20 +1,9 @@
 import pandas as pd
 from src.config import load_config
 from src.oracles import Oracle
-import sklearn
 import statsmodels.api as sm
 
 class Reporting:
-    """
-    The Reporting class provides functionality to generate financial reports, 
-    forecast future asset values, and simulate asset behavior over time. It integrates 
-    with data sources to retrieve historical data, utilizes statistical models for 
-    forecasting, and encapsulates model training and prediction for simulations.
-    Methods:
-    generate_report: Compiles a report about the current value and weight of assets in a portfolio.
-    generate_forecast: Predicts future values of assets over a given forecast period.
-    generate_simulation: Runs simulations of asset behavior over a given simulation period.
-    """
     def __init__(self):
         self.config = load_config()
 
@@ -43,7 +32,6 @@ class Reporting:
         return historical_data
 
     def train_forecast_model(self, historical_data):
-        # Placeholder code - actual implementation will depend on the model choice and data specifics
         # Assuming historical_data is a pandas DataFrame with columns: ['date', 'price']
         X = historical_data['date'].values.reshape(-1, 1)  # Feature (e.g., dates converted to ordinal)
         y = historical_data['price'].values  # Target (prices)
@@ -53,10 +41,6 @@ class Reporting:
         model = LinearRegression()
         model.fit(X, y)
         
-        # Example using statsmodels (e.g., SARIMA model)
-        # import statsmodels.api as sm
-        # model = sm.tsa.statespace.SARIMAX(y, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
-        # model = model.fit()
 
         return model
 
