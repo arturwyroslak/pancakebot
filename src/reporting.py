@@ -1,6 +1,7 @@
 import pandas as pd
 from src.config import load_config
 from src.oracles import Oracle
+import sklearn
 import statsmodels.api as sm
 
 class Reporting:
@@ -32,6 +33,7 @@ class Reporting:
         return historical_data
 
     def train_forecast_model(self, historical_data):
+        # Placeholder code - actual implementation will depend on the model choice and data specifics
         # Assuming historical_data is a pandas DataFrame with columns: ['date', 'price']
         X = historical_data['date'].values.reshape(-1, 1)  # Feature (e.g., dates converted to ordinal)
         y = historical_data['price'].values  # Target (prices)
@@ -41,6 +43,10 @@ class Reporting:
         model = LinearRegression()
         model.fit(X, y)
         
+        # Example using statsmodels (e.g., SARIMA model)
+        # import statsmodels.api as sm
+        # model = sm.tsa.statespace.SARIMAX(y, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
+        # model = model.fit()
 
         return model
 
@@ -57,5 +63,18 @@ class Reporting:
         return simulation
 
     def train_simulation_model(self, historical_data):
-        # This function should be implemented to train a simulation model using the historical data
-        pass
+        # Check that historical_data is not empty and contains the required columns
+        if historical_data.empty:
+            raise ValueError("Historical data is empty. Cannot train simulation model.")
+        if not {'date', 'price'}.issubset(historical_data.columns):
+            raise ValueError("Historical data must contain 'date' and 'price' columns.")
+        # Convert the 'date' column to numerical values for the model
+        historical_data['date_ordinal'] = pd.to_datetime(historical_data['date']).map(lambda x: x.toordinal())
+        X = historical_data[['date_ordinal']]  # Features
+        y = historical_data['price']  # Target
+        # Train a regression model as an example of a simulation model
+        from sklearn.linear_model import LinearRegression
+        model = LinearRegression()
+        model.fit(X, y)
+        # The trained model can be used to predict prices (simulate) for future dates
+        return model
