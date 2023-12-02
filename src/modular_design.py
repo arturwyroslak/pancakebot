@@ -1,19 +1,20 @@
 ```python
-from src.config import load_config
-from src.pancakeswap_api import get_market_data
-from src.oracles import get_price_data
-from src.trading_strategies import apply_trading_strategy
-from src.smart_contracts import execute_transaction
-from src.yield_farming import manage_yield_farming
-from src.staking import manage_staking
-from src.impermanent_loss import analyze_impermanent_loss
-from src.defi_contracts import interact_with_defi_contracts
-from src.security import secure_transaction
-from src.portfolio_balancing import balance_portfolio
-from src.user_interface import customize_UI
-from src.reporting import generate_report
-from src.transaction_fee_optimization import optimize_transaction_fee
 from src.blockchain_networks import switch_blockchain_network
+from src.config import load_config
+from src.defi_contracts import interact_with_defi_contracts
+from src.impermanent_loss import analyze_impermanent_loss
+from src.oracles import get_price_data
+from src.pancakeswap_api import get_market_data
+from src.portfolio_balancing import balance_portfolio
+from src.reporting import generate_report
+from src.security import secure_transaction
+from src.smart_contracts import execute_transaction
+from src.staking import manage_staking
+from src.trading_strategies import apply_trading_strategy
+from src.transaction_fee_optimization import optimize_transaction_fee
+from src.user_interface import customize_UI
+from src.yield_farming import manage_yield_farming
+
 
 class PancakeSwapBot:
     def __init__(self):
