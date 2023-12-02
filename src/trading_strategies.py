@@ -1,12 +1,16 @@
 ```python
 import pandas as pd
-from src.pancakeswap_api import get_market_data
-from src.oracles import get_price_data
-from src.smart_contracts import execute_transaction
+import talib
 from src.config import load_config
+from src.oracles import get_price_data
+from src.pancakeswap_api import get_market_data
+from src.smart_contracts import execute_transaction
+
 
 class TradingStrategies:
     def __init__(self):
+        self.config = load_config()
+        self.indicators = self.config.get('trading_algorithm', {})
         self.config = load_config()
 
     def apply_trading_strategy(self, strategy):
@@ -30,6 +34,41 @@ class TradingStrategies:
             execute_transaction('buy', self.config['amount_to_buy'])
 
     def strategy2(self):
+    def calculate_indicator(self, indicator_name, data):
+        if indicator_name == 'MACD':
+            macd, signal, hist = talib.MACD(data)
+            return macd, signal
+        elif indicator_name == 'RSI':
+            rsi = talib.RSI(data)
+            return rsi
+        else:
+            print("Invalid indicator")
+            return None
+
+    def validate_price_data(self, price_data):
+        if 'current_price' in price_data and 'average_price' in price_data:
+            if isinstance(price_data['current_price'], (int, float)) and isinstance(price_data['average_price'], (int, float)):
+                return True
+        return False
+
+    def strategy1(self):
+        market_data = get_market_data()
+        price_data = get_price_data()
+
+        if not self.validate_price_data(price_data):
+            print("Invalid price data")
+            return
+
+        macd, signal = self.calculate_indicator('MACD', market_data['close'])
+
+        if macd[-1] > signal[-1]:
+            execute_transaction(self.config['contract_address'], 'buy', self.config['amount_to_buy'])
+            print("Buy executed with amount:", self.config['amount_to_buy'])
+        elif macd[-1] < signal[-1]:
+            execute_transaction(self.config['contract_address'], 'sell', self.config['amount_to_sell'])
+            print("Sell executed with amount:", self.config['amount_to_sell'])
+        else:
+            print("Hold")
         market_data = get_market_data()
         price_data = get_price_data()
 
@@ -45,3 +84,21 @@ if __name__ == "__main__":
     trading_bot = TradingStrategies()
     trading_bot.apply_trading_strategy('strategy1')
 ```
+    def strategy2(self):
+        market_data = get_market_data()
+        price_data = get_price_data()
+
+        if not self.validate_price_data(price_data):
+            print("Invalid price data")
+            return
+
+        rsi = self.calculate_indicator('RSI', market_data['close'])
+
+        if rsi[-1] < 30:
+            execute_transaction(self.config['contract_address'], 'buy', self.config['amount_to_buy'])
+            print("Buy executed with amount:", self.config['amount_to_buy'])
+        elif rsi[-1] > 70:
+            execute_transaction(self.config['contract_address'], 'sell', self.config['amount_to_sell'])
+            print("Sell executed with amount:", self.config['amount_to_sell'])
+        else:
+            print("Hold")
