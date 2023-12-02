@@ -1,12 +1,14 @@
 ```python
 import tkinter as tk
 from tkinter import ttk
+
 from src.config import load_config
-from src.pancakeswap_api import get_market_data
 from src.oracles import get_price_data
-from src.trading_strategies import apply_trading_strategy
+from src.pancakeswap_api import get_market_data
 from src.portfolio_balancing import balance_portfolio
 from src.reporting import generate_report
+from src.trading_strategies import apply_trading_strategy
+
 
 class UserInterface:
     def __init__(self):
@@ -31,22 +33,39 @@ class UserInterface:
         report_button.pack()
 
     def display_market_data(self):
-        market_data = get_market_data()
-        print(market_data)
+        try:
+            market_data = get_market_data()
+            messagebox.showinfo("Market Data", market_data)
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def display_price_data(self):
-        price_data = get_price_data()
-        print(price_data)
+        try:
+            price_data = get_price_data()
+            messagebox.showinfo("Price Data", price_data)
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def apply_strategy(self):
-        apply_trading_strategy()
+        try:
+            apply_trading_strategy()
+            messagebox.showinfo("Success", "Trading strategy applied successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def balance_portfolio(self):
-        balance_portfolio()
+        try:
+            balance_portfolio()
+            messagebox.showinfo("Success", "Portfolio balanced successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def generate_report(self):
-        report = generate_report()
-        print(report)
+        try:
+            report = generate_report()
+            messagebox.showinfo("Report", report)
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def run(self):
         self.create_widgets()
@@ -56,3 +75,20 @@ if __name__ == "__main__":
     ui = UserInterface()
     ui.run()
 ```
+    def validate_config(self):
+        try:
+            # Validate loaded configuration
+            if not self.config:
+                messagebox.showerror("Error", "Configuration not loaded.")
+                return False
+            if "api_key" not in self.config:
+                messagebox.showerror("Error", "API key not found in configuration.")
+                return False
+            # Add more validation checks if needed
+            return True
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+            return False
+
+    def update_ui(self, message):
+        messagebox.showinfo("Message", message)
