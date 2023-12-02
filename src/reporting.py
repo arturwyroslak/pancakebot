@@ -1,15 +1,22 @@
 import pandas as pd
-from src.config import load_config
-from src.oracles import Oracle
 import sklearn
 import statsmodels.api as sm
+from src.config import load_config
+from src.oracles import Oracle
+
 
 class Reporting:
     def __init__(self):
         self.config = load_config()
 
     def generate_report(self, portfolio):
-        report = pd.DataFrame(portfolio)
+            # Check if portfolio is a list of dictionaries
+            if not isinstance(portfolio, list) or not all(isinstance(item, dict) for item in portfolio):
+                raise TypeError("Portfolio must be a list of dictionaries.")
+            # Check if each dictionary in portfolio contains 'Amount' and 'Price' keys
+            if not all('Amount' in item and 'Price' in item for item in portfolio):
+                raise ValueError("Each dictionary in portfolio must contain 'Amount' and 'Price' keys.")
+            report = pd.DataFrame(portfolio)
         report['Value'] = report['Amount'] * report['Price']
         total_value = report['Value'].sum()
         report['Percentage'] = report['Value'] / total_value * 100
