@@ -18,7 +18,7 @@ YIELD_FARMING_STRATEGY = "highest_apr"  # Strategy based on highest Annual Perce
 STAKING_STRATEGY = "highest_rewards"  # Strategy based on highest rewards
 
 # DeFi Contracts configuration
-DEFI_CONTRACT_ADDRESS = "0x..."
+DEFI_CONTRACT_ADDRESS = "0x1234567890"
 
 # Security configuration
 SECURITY_LEVEL = "high"  # High level of security measures
