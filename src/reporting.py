@@ -32,21 +32,30 @@ class Reporting:
         historical_data = oracle.get_price_data(asset)
         return historical_data
 
-    def train_forecast_model(self, historical_data):
-        # Placeholder code - actual implementation will depend on the model choice and data specifics
-        # Assuming historical_data is a pandas DataFrame with columns: ['date', 'price']
-        X = historical_data['date'].values.reshape(-1, 1)  # Feature (e.g., dates converted to ordinal)
-        y = historical_data['price'].values  # Target (prices)
-        
-        # Example using sklearn (e.g., linear regression model)
-        from sklearn.linear_model import LinearRegression
-        model = LinearRegression()
-        model.fit(X, y)
-        
-        # Example using statsmodels (e.g., SARIMA model)
-        # import statsmodels.api as sm
-        # model = sm.tsa.statespace.SARIMAX(y, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
-        # model = model.fit()
+    def train_forecast_model(self, historical_data, model_type='linear'):
+        # Validate that historical_data is a pandas DataFrame with 'date' and 'price' columns
+        if not isinstance(historical_data, pd.DataFrame) or 'date' not in historical_data or 'price' not in historical_data:
+            raise ValueError("historical_data must be a pandas DataFrame with 'date' and 'price' columns")
+
+        # Convert 'date' to numerical format for regression analysis
+        historical_data['date_ordinal'] = pd.to_datetime(historical_data['date']).apply(lambda x: x.toordinal())
+
+        # Prepare features (X) and target (y)
+        X = historical_data['date_ordinal'].values.reshape(-1, 1)
+        y = historical_data['price'].values
+
+        # Select the model type
+        if model_type == 'linear':
+            from sklearn.linear_model import LinearRegression
+            model = LinearRegression()
+        elif model_type == 'sarima':
+            import statsmodels.api as sm
+            model = sm.tsa.statespace.SARIMAX(y, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
+        else:
+            raise ValueError("Unsupported model_type. Choose 'linear' or 'sarima'.")
+
+        # Fit the model
+        model = model.fit()
 
         return model
 
@@ -62,6 +71,22 @@ class Reporting:
         simulation = simulation_model.simulate(simulation_period)
         return simulation
 
-    def train_simulation_model(self, historical_data):
-        # This function should be implemented to train a simulation model using the historical data
-        pass
+    def train_simulation_model(self, historical_data, simulation_type='monte_carlo'):
+        # Validate that historical_data is a pandas DataFrame with at least 'price' column
+        if not isinstance(historical_data, pd.DataFrame) or 'price' not in historical_data:
+            raise ValueError("historical_data must be a pandas DataFrame with a 'price' column")
+
+        # Prepare target data (y) for simulation
+        y = historical_data['price'].values
+
+        # Select the simulation type - using Monte Carlo as an example here
+        if simulation_type == 'monte_carlo':
+            # Placeholder for Monte Carlo simulation logic
+            simulation_model = 'Monte Carlo simulation logic goes here'
+        else:
+            raise ValueError("Unsupported simulation_type. Example: 'monte_carlo'.")
+
+        # Here, you would implement the logic for training the simulation model based on the historical data
+        # As currently, this is placeholder text, it should be replaced with the actual simulation training logic
+
+        return simulation_model
