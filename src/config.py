@@ -1,4 +1,3 @@
-```python
 # Configuration file for PancakeSwap Profit Maximizing Bot
 
 # PancakeSwap API configuration
@@ -8,7 +7,7 @@ PANCAKESWAP_API_URL = "https://api.pancakeswap.com/api/v1/"
 ORACLE_API_URL = "https://oracleapi.com/"
 
 # Smart Contract configuration
-SMART_CONTRACT_ADDRESS = "0x..."
+SMART_CONTRACT_ADDRESS = "0x..."  # TODO: Replace with actual smart contract address
 
 # Trading Algorithm configuration
 TRADING_ALGORITHM = "MACD"  # Moving Average Convergence Divergence
@@ -18,7 +17,7 @@ YIELD_FARMING_STRATEGY = "highest_apr"  # Strategy based on highest Annual Perce
 STAKING_STRATEGY = "highest_rewards"  # Strategy based on highest rewards
 
 # DeFi Contracts configuration
-DEFI_CONTRACT_ADDRESS = "0x..."
+DEFI_CONTRACT_ADDRESS = "0x..."  # TODO: Replace with actual DeFi contract address
 
 # Security configuration
 SECURITY_LEVEL = "high"  # High level of security measures
@@ -56,4 +55,40 @@ def load_config():
         "modular_design": MODULAR_DESIGN
     }
     return config
-```
+
+
+# Function to test if configurations are loaded correctly
+def test_load_config():
+    expected_keys = {    
+        "pancakeswap_api_url": PANCAKESWAP_API_URL,
+        "oracle_api_url": ORACLE_API_URL,
+        "smart_contract_address": SMART_CONTRACT_ADDRESS,
+        "trading_algorithm": TRADING_ALGORITHM,
+        "yield_farming_strategy": YIELD_FARMING_STRATEGY,
+        "staking_strategy": STAKING_STRATEGY,
+        "defi_contract_address": DEFI_CONTRACT_ADDRESS,
+        "security_level": SECURITY_LEVEL,
+        "portfolio_balancing_strategy": PORTFOLIO_BALANCING_STRATEGY,
+        "ui_level": UI_LEVEL,
+        "transaction_fee_optimization": TRANSACTION_FEE_OPTIMIZATION,
+        "blockchain_network": BLOCKCHAIN_NETWORK,
+        "modular_design": MODULAR_DESIGN
+    }
+    
+    # Load actual config using the provided load_config function
+    actual_config = load_config()
+    
+    # Check for presence and correctness of each configuration
+    for key, expected_value in expected_keys.items():
+        # Verify that the key exists in the actual config
+        assert key in actual_config, f"Key '{key}' is missing in the actual configuration."
+        
+        # Compare actual value against expected value
+        assert actual_config[key] == expected_value, (
+            f"Mismatch for key '{key}': expected '{expected_value}', found '{actual_config[key]}'"
+        )
+    
+    print("All configurations loaded correctly.")
+
+# Run the test
+test_load_config()
