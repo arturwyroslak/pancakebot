@@ -1,22 +1,15 @@
 import pandas as pd
-import sklearn
-import statsmodels.api as sm
 from src.config import load_config
 from src.oracles import Oracle
-
+import sklearn
+import statsmodels.api as sm
 
 class Reporting:
     def __init__(self):
         self.config = load_config()
 
     def generate_report(self, portfolio):
-            # Check if portfolio is a list of dictionaries
-            if not isinstance(portfolio, list) or not all(isinstance(item, dict) for item in portfolio):
-                raise TypeError("Portfolio must be a list of dictionaries.")
-            # Check if each dictionary in portfolio contains 'Amount' and 'Price' keys
-            if not all('Amount' in item and 'Price' in item for item in portfolio):
-                raise ValueError("Each dictionary in portfolio must contain 'Amount' and 'Price' keys.")
-            report = pd.DataFrame(portfolio)
+        report = pd.DataFrame(portfolio)
         report['Value'] = report['Amount'] * report['Price']
         total_value = report['Value'].sum()
         report['Percentage'] = report['Value'] / total_value * 100
@@ -25,14 +18,20 @@ class Reporting:
     def generate_forecast(self, portfolio, forecast_period):
         forecast = {}
         for asset in portfolio:
-            forecast[asset] = self.forecast_asset(asset, forecast_period)
+            try:
+                forecast[asset] = self.forecast_asset(asset, forecast_period)
+            except Exception as e:
+                forecast[asset] = f"Error forecasting asset {asset}: {e}"
         return forecast
 
     def forecast_asset(self, asset, forecast_period):
-        historical_data = self.get_historical_data(asset)
-        forecast_model = self.train_forecast_model(historical_data)
-        forecast = forecast_model.predict(forecast_period)
-        return forecast
+        try:
+            historical_data = self.get_historical_data(asset)
+            forecast_model = self.train_forecast_model(historical_data)
+            forecast = forecast_model.predict(forecast_period)
+            return forecast
+        except Exception as e:
+            raise RuntimeError(f"Failed to forecast for asset {asset}: {e}")
 
     def get_historical_data(self, asset):
         oracle = Oracle()
@@ -70,18 +69,5 @@ class Reporting:
         return simulation
 
     def train_simulation_model(self, historical_data):
-        # Check that historical_data is not empty and contains the required columns
-        if historical_data.empty:
-            raise ValueError("Historical data is empty. Cannot train simulation model.")
-        if not {'date', 'price'}.issubset(historical_data.columns):
-            raise ValueError("Historical data must contain 'date' and 'price' columns.")
-        # Convert the 'date' column to numerical values for the model
-        historical_data['date_ordinal'] = pd.to_datetime(historical_data['date']).map(lambda x: x.toordinal())
-        X = historical_data[['date_ordinal']]  # Features
-        y = historical_data['price']  # Target
-        # Train a regression model as an example of a simulation model
-        from sklearn.linear_model import LinearRegression
-        model = LinearRegression()
-        model.fit(X, y)
-        # The trained model can be used to predict prices (simulate) for future dates
-        return model
+        # This function should be implemented to train a simulation model using the historical data
+        pass
