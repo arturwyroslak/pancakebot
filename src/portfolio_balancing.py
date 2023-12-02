@@ -1,4 +1,3 @@
-```python
 import pandas as pd
 from src.pancakeswap_api import get_market_data
 from src.oracles import get_price_data
@@ -55,4 +54,64 @@ class PortfolioBalancer:
                 })
 
         return rebalance_orders
-```
+
+import unittest
+from unittest.mock import MagicMock
+
+class TestPortfolioBalancer(unittest.TestCase):
+
+    def setUp(self):
+        # Mock the load_config and external data fetching functions
+        with unittest.mock.patch('src.config.load_config', return_value={'assets': ['BTC', 'ETH']}):
+            from src.pancakeswap_api import get_market_data
+            from src.oracles import get_price_data
+            from src.trading_strategies import apply_trading_strategy
+
+            # Mocking the market and price data with example values for testing
+            get_market_data_mock = MagicMock(return_value=pd.DataFrame({
+                'asset': ['BTC', 'ETH'],
+                'market_value': [50000, 2500]
+            }))
+            get_price_data_mock = MagicMock(return_value=pd.DataFrame({
+                'asset': ['BTC', 'ETH'],
+                'price': [51000, 2400]
+            }))
+            apply_trading_strategy_mock = MagicMock(return_value={'BTC': 0.6, 'ETH': 0.4})
+
+            # Create a test instance of the PortfolioBalancer
+            self.portfolio_balancer = PortfolioBalancer()
+            self.portfolio_balancer.portfolio = pd.DataFrame({
+                'asset': ['BTC', 'ETH'],
+                'quantity': [1, 10],
+                'value': [50000, 25000]
+            })
+            self.portfolio_balancer.assets = ['BTC', 'ETH']
+
+    def test_balance_portfolio(self):
+        # Run the balance_portfolio method to update weights
+        self.portfolio_balancer.balance_portfolio()
+
+        # Check the portfolio values have been updated correctly
+        expected_portfolio_values = pd.DataFrame({
+            'asset': ['BTC', 'ETH'],
+            'quantity': [1, 10],
+            'value': [51000, 24000],
+            'weight': [0.6800, 0.3200]  # Calculated based on the mock price data provided
+        })
+        pd.testing.assert_frame_equal(self.portfolio_balancer.portfolio, expected_portfolio_values, check_dtype=False)
+
+    def test_get_rebalance_orders(self):
+        # Pre-calculate the weight and get the rebalance orders
+        self.portfolio_balancer.balance_portfolio()
+        rebalance_orders = self.portfolio_balancer._get_rebalance_orders({'BTC': 0.5, 'ETH': 0.5})
+
+        # Check if the generated rebalance orders match the expected orders
+        expected_rebalance_orders = [
+            {'action': 'SELL', 'asset': 'BTC', 'quantity': 90.00},
+            {'action': 'BUY',  'asset': 'ETH', 'quantity': 60.00}
+        ]  # Assuming total value = 75000, BTC weight to reduce by 0.18, ETH weight to increase by 0.18
+
+        self.assertEqual(rebalance_orders, expected_rebalance_orders)
+
+if __name__ == '__main__':
+    unittest.main()
