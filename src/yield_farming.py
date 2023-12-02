@@ -28,23 +28,19 @@ class YieldFarmingManager:
                 self.remove_liquidity(pool)
 
     def should_add_liquidity(self, pool_data, pool_price):
-        # Example logic for when to add liquidity
+        # Logic for when to add liquidity
         price_difference_threshold = 0.05 # e.g., 5%
         high_apy_threshold = 10 # e.g., 10%
         current_price_to_target_ratio = pool_price / pool_data['target_price']
         price_spread_significant = abs(1 - current_price_to_target_ratio) > price_difference_threshold
         apy_high = pool_data['apy'] > high_apy_threshold
-        if price_spread_significant or apy_high:
-            return True
-        return False
+        return price_spread_significant or apy_high
 
     def should_remove_liquidity(self, pool_data, pool_price):
-        # Example logic for when to remove liquidity
+        # Logic for when to remove liquidity
         impermanent_loss_threshold = 0.10 # e.g., 10%
-        impermanent_loss = analyze_impermanent_loss(pool_data, pool_price)
-        if impermanent_loss > impermanent_loss_threshold:
-            return True
-        return False
+        impermanent_loss = self.analyze_impermanent_loss(pool_data, pool_price)
+        return impermanent_loss > impermanent_loss_threshold
 
     def add_liquidity(self, pool):
         # Extract token addresses, amounts, slipperage settings from the pool config
@@ -57,9 +53,66 @@ class YieldFarmingManager:
         # Convert them into parameters for PancakeSwap contract interaction
         parameters = [tokenA, tokenB, amountA, amountB, slippage, deadline]
         # Use the relevant functions from src/smart_contracts.py to build and execute the add liquidity transaction
-        execute_transaction(self.pancake_swap_contract.functions.addLiquidityETH, parameters)
+        try:
+            execute_transaction(self.pancake_swap_contract.functions.addLiquidityETH, parameters)
+        except Exception as e:
+            print(f"Failed to add liquidity due to: {str(e)}")
 
     def remove_liquidity(self, pool):
+        # Extract liquidity, minimum amounts, and deadline from the pool config
+        liquidity = pool['liquidity']
+        amountAMin = pool['amountAMin']
+        amountBMin = pool['amountBMin']
+        deadline = pool['deadline']
+        # Convert them into parameters for PancakeSwap contract interaction
+        parameters = [liquidity, amountAMin, amountBMin, deadline]
+        # Use the relevant functions from src/smart_contracts.py to build and execute the remove liquidity transaction
+        try:
+            execute_transaction(self.pancake_swap_contract.functions.removeLiquidityETH, parameters)
+        except Exception as e:
+            print(f"Failed to remove liquidity due to: {str(e)}")
+import unittest
+from unittest.mock import Mock, patch
+
+
+class TestYieldFarmingManager(unittest.TestCase):
+    def setUp(self):
+        self.manager = YieldFarmingManager()
+        self.pool = {
+            'tokenA': '0x...',
+            'tokenB': '0x...',
+            'amountA': 1,
+            'amountB': 1,
+            'slippage': 0.01,
+            'deadline': 1622540400
+        }
+
+    @patch('src.yield_farming.execute_transaction')
+    def test_add_liquidity_success(self, mock_execute):
+        mock_execute.return_value = True
+        self.manager.add_liquidity(self.pool)
+        mock_execute.assert_called_once()
+
+    @patch('src.yield_farming.execute_transaction')
+    def test_add_liquidity_failure(self, mock_execute):
+        mock_execute.side_effect = Exception('Failed to add liquidity')
+        self.manager.add_liquidity(self.pool)
+        mock_execute.assert_called_once()
+
+    @patch('src.yield_farming.execute_transaction')
+    def test_remove_liquidity_success(self, mock_execute):
+        mock_execute.return_value = True
+        self.manager.remove_liquidity(self.pool)
+        mock_execute.assert_called_once()
+
+    @patch('src.yield_farming.execute_transaction')
+    def test_remove_liquidity_failure(self, mock_execute):
+        mock_execute.side_effect = Exception('Failed to remove liquidity')
+        self.manager.remove_liquidity(self.pool)
+        mock_execute.assert_called_once()
+
+if __name__ == '__main__':
+    unittest.main()
         # Extract liquidity, minimum amounts, and deadline from the pool config
         liquidity = pool['liquidity']
         amountAMin = pool['amountAMin']
