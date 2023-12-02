@@ -1,4 +1,5 @@
 from eth_account import Account
+import random
 from src.config import INFURA_URL, PRIVATE_KEY
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
@@ -38,14 +39,14 @@ def check_overflow_underflow(transaction):
     It is important to check for overflows and underflows to prevent attackers from causing integer
     wraparounds, which can result in unauthorized token generation or destruction.
     """
-    # Example checks for overflow/underflow
-    if 'value' in transaction:
-        value = transaction['value']
-        if not is_integer(value) or not (0 <= big_endian_to_int(value) < 2**256):
-            raise ValueError("Transaction 'value' is out of bounds.")
-    # Additional transaction fields to check (e.g., gas, gasPrice) could be added here
-    # ...
-    # The function can be expanded to include more checks as necessary
+    # Ensure that all numerically relevant fields are within safe bounds to prevent overflow/underflow
+    numeric_fields = ['value', 'gas', 'gasPrice', 'nonce']
+    for field in numeric_fields:
+        if field in transaction:
+            num = transaction[field]
+            if not is_integer(num) or not (0 <= big_endian_to_int(num) < 2**256):
+                raise ValueError(f"Transaction '{field}' is out of bounds.")
+    # The function can be expanded to include more checks as necessary for additional fields
     pass
 
 def anonymize_transaction(transaction):
