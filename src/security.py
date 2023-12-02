@@ -46,7 +46,6 @@ def check_overflow_underflow(transaction):
             if not is_integer(value) or not (0 <= big_endian_to_int(value) < 2**256):
                 raise ValueError(f"Transaction '{field}' is out of bounds.")
     # The function can be expanded to include more checks as necessary
-
     pass
 
 def anonymize_transaction(transaction):
@@ -57,17 +56,18 @@ def anonymize_transaction(transaction):
     impossible to link the new transaction to the original one.
     """
     # Create a new transaction with the same value but different metadata
+    # For genuine anonymization, a more advanced approach would be necessary.
+    # The following code assumes that an account ready for anonymization is provided.
+    #
+    # NOTE: The implementation here is a placeholder and should not be used for genuine anonymization.
     anonymized_transaction = {
         'to': transaction['to'],
         'value': transaction['value'],
         'gas': transaction['gas'],
         'gasPrice': transaction['gasPrice'],
-        # Use a random nonce for the new transaction
-        'nonce': web3.eth.getTransactionCount(Account.create().address),
-        # Use a random private key for the new transaction
-        'privateKey': Account.create().privateKey
+        'nonce': web3.eth.getTransactionCount(web3.eth.defaultAccount)
     }
 
-    # Sign and send the anonymized transaction
+    # Sign and send the anonymized transaction with the original private key
     signed_txn = web3.eth.account.sign_transaction(anonymized_transaction, PRIVATE_KEY)
     return web3.eth.sendRawTransaction(signed_txn.rawTransaction)
