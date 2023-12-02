@@ -24,8 +24,14 @@ def check_reentrancy(transaction):
     """
     Function to check for reentrancy attacks.
     """
-    # TODO: Implement reentrancy check logic
-    pass
+    # Basic reentrancy check logic (for illustration purposes)
+    # Checking for multiple calls to the same function (simplified algorithm using a call counter)
+    if transaction.get("input"):
+        function_signature = transaction["input"][:10] # assuming function signature is at the beginning
+        with web3.eth.filter({"fromBlock": "latest", "to": transaction["from"], "data": function_signature}) as filter:
+            call_count = len(filter.get_new_entries())
+            if call_count > 1:
+                raise RuntimeError("Potential reentrancy attack detected")
 
 from eth_utils import big_endian_to_int, is_integer, to_int
 
