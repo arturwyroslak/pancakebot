@@ -1,4 +1,3 @@
-```python
 # Configuration file for PancakeSwap Profit Maximizing Bot
 
 # PancakeSwap API configuration
@@ -56,4 +55,3 @@ def load_config():
         "modular_design": MODULAR_DESIGN
     }
     return config
-```
