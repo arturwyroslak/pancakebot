@@ -2,7 +2,6 @@ import pandas as pd
 from src.config import load_config
 from src.oracles import Oracle
 import sklearn
-import statsmodels.api as sm
 
 class Reporting:
     def __init__(self):
@@ -18,20 +17,14 @@ class Reporting:
     def generate_forecast(self, portfolio, forecast_period):
         forecast = {}
         for asset in portfolio:
-            try:
-                forecast[asset] = self.forecast_asset(asset, forecast_period)
-            except Exception as e:
-                forecast[asset] = f"Error forecasting asset {asset}: {e}"
+            forecast[asset] = self.forecast_asset(asset, forecast_period)
         return forecast
 
     def forecast_asset(self, asset, forecast_period):
-        try:
-            historical_data = self.get_historical_data(asset)
-            forecast_model = self.train_forecast_model(historical_data)
-            forecast = forecast_model.predict(forecast_period)
-            return forecast
-        except Exception as e:
-            raise RuntimeError(f"Failed to forecast for asset {asset}: {e}")
+        historical_data = self.get_historical_data(asset)
+        forecast_model = self.train_forecast_model(historical_data)
+        forecast = forecast_model.predict(forecast_period)
+        return forecast
 
     def get_historical_data(self, asset):
         oracle = Oracle()
@@ -39,6 +32,7 @@ class Reporting:
         return historical_data
 
     def train_forecast_model(self, historical_data):
+        import sklearn
         # Placeholder code - actual implementation will depend on the model choice and data specifics
         # Assuming historical_data is a pandas DataFrame with columns: ['date', 'price']
         X = historical_data['date'].values.reshape(-1, 1)  # Feature (e.g., dates converted to ordinal)
@@ -50,8 +44,7 @@ class Reporting:
         model.fit(X, y)
         
         # Example using statsmodels (e.g., SARIMA model)
-        # import statsmodels.api as sm
-        # model = sm.tsa.statespace.SARIMAX(y, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
+        #         # model = sm.tsa.statespace.SARIMAX(y, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
         # model = model.fit()
 
         return model
