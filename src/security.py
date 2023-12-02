@@ -24,14 +24,8 @@ def check_reentrancy(transaction):
     """
     Function to check for reentrancy attacks.
     """
-    # Basic reentrancy check logic (for illustration purposes)
-    # Checking for multiple calls to the same function (simplified algorithm using a call counter)
-    if transaction.get("input"):
-        function_signature = transaction["input"][:10] # assuming function signature is at the beginning
-        with web3.eth.filter({"fromBlock": "latest", "to": transaction["from"], "data": function_signature}) as filter:
-            call_count = len(filter.get_new_entries())
-            if call_count > 1:
-                raise RuntimeError("Potential reentrancy attack detected")
+    # TODO: Implement reentrancy check logic
+    pass
 
 from eth_utils import big_endian_to_int, is_integer, to_int
 
@@ -45,13 +39,14 @@ def check_overflow_underflow(transaction):
     wraparounds, which can result in unauthorized token generation or destruction.
     """
     # Example checks for overflow/underflow
-    if 'value' in transaction:
-        value = transaction['value']
-        if not is_integer(value) or not (0 <= big_endian_to_int(value) < 2**256):
-            raise ValueError("Transaction 'value' is out of bounds.")
-    # Additional transaction fields to check (e.g., gas, gasPrice) could be added here
-    # ...
+    numeric_fields = ['value', 'gas', 'gasPrice']
+    for field in numeric_fields:
+        if field in transaction:
+            value = transaction[field]
+            if not is_integer(value) or not (0 <= big_endian_to_int(value) < 2**256):
+                raise ValueError(f"Transaction '{field}' is out of bounds.")
     # The function can be expanded to include more checks as necessary
+
     pass
 
 def anonymize_transaction(transaction):
