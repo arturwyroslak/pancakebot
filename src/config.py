@@ -67,4 +67,5 @@ def load_config():
         "blockchain_networks": blockchain_networks,
         "modular_design": MODULAR_DESIGN
     }
+
     return config
