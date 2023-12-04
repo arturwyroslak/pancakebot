@@ -1,4 +1,3 @@
-```python
 import sys
 from src.config import load_config
 from src.pancakeswap_api import get_market_data
@@ -17,55 +16,30 @@ from src.transaction_fee_optimization import optimize_transaction_fee
 from src.blockchain_networks import switch_blockchain_network
 from src.modular_design import add_module
 
-def main():
-    # Load configuration variables
-    config = load_config()
+class PancakeSwapBot:
+    def __init__(self):
+        self.config = load_config()
 
-    # Get market data from PancakeSwap API
-    market_data = get_market_data(config)
+    def add_module(self, module):
+        self.__dict__.update(module)
 
-    # Get price data from Oracles
-    price_data = get_price_data(config)
-
-    # Apply trading strategy
-    trading_strategy = apply_trading_strategy(market_data, price_data, config)
-
-    # Execute transactions using smart contracts
-    transaction = execute_transaction(trading_strategy, config)
-
-    # Manage yield farming
-    yield_farming = manage_yield_farming(transaction, config)
-
-    # Manage staking
-    staking = manage_staking(transaction, config)
-
-    # Analyze impermanent loss
-    impermanent_loss = analyze_impermanent_loss(yield_farming, staking, config)
-
-    # Interact with DeFi contracts
-    defi_contracts = interact_with_defi_contracts(transaction, config)
-
-    # Secure transactions and smart contracts
-    secure_transaction(transaction, defi_contracts, config)
-
-    # Balance the portfolio
-    balance_portfolio(transaction, defi_contracts, config)
-
-    # Customize user interface
-    customize_UI(config)
-
-    # Generate report
-    generate_report(transaction, defi_contracts, config)
-
-    # Optimize transaction fee
-    optimize_transaction_fee(transaction, config)
-
-    # Switch between different blockchain networks
-    switch_blockchain_network(config)
-
-    # Add new modules in the bot
-    add_module(config)
+    def run(self):
+        market_data = get_market_data(self.config)
+        price_data = get_price_data(self.config)
+        trading_strategy = apply_trading_strategy(self.config, market_data, price_data)
+        transaction = execute_transaction(self.config, trading_strategy)
+        yield_farming = manage_yield_farming(self.config, market_data, price_data)
+        staking = manage_staking(self.config, market_data, price_data)
+        impermanent_loss = analyze_impermanent_loss(self.config, yield_farming, staking)
+        defi_contracts = interact_with_defi_contracts(self.config, market_data, price_data)
+        secure_transaction(self.config, transaction)
+        balance_portfolio(self.config, market_data, price_data, trading_strategy)
+        customize_UI(self.config)
+        report = generate_report(self.config, market_data, price_data, trading_strategy, yield_farming, staking, impermanent_loss, defi_contracts)
+        optimize_transaction_fee(self.config, transaction)
+        switch_blockchain_network(self.config)
 
 if __name__ == "__main__":
+    bot = PancakeSwapBot()
+    bot.run()
     main()
-```
