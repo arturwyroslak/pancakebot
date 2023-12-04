@@ -1,4 +1,3 @@
-```python
 # Configuration file for PancakeSwap Profit Maximizing Bot
 
 # PancakeSwap API configuration
@@ -33,7 +32,12 @@ UI_LEVEL = "advanced"  # Advanced level of user interface
 TRANSACTION_FEE_OPTIMIZATION = True  # Enable transaction fee optimization
 
 # Blockchain Networks configuration
-BLOCKCHAIN_NETWORK = "Binance_Smart_Chain"  # Default blockchain network
+blockchain_networks = {
+    "default": "https://bsc-dataseed.binance.org/",
+    "ethereum": "https://mainnet.infura.io/v3/your_project_id",
+    "binance_smart_chain": "https://bsc-dataseed.binance.org/",
+    "polygon": "https://rpc-mainnet.maticvigil.com/"
+}
 
 # Modular Design configuration
 MODULAR_DESIGN = True  # Enable modular design
@@ -52,8 +56,7 @@ def load_config():
         "portfolio_balancing_strategy": PORTFOLIO_BALANCING_STRATEGY,
         "ui_level": UI_LEVEL,
         "transaction_fee_optimization": TRANSACTION_FEE_OPTIMIZATION,
-        "blockchain_network": BLOCKCHAIN_NETWORK,
+        "blockchain_networks": blockchain_networks,
         "modular_design": MODULAR_DESIGN
     }
     return config
-```
