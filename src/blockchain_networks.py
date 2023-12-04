@@ -1,6 +1,7 @@
 ```python
-from web3 import Web3
 from src.config import load_config
+from web3 import Web3
+
 
 class BlockchainNetwork:
     def __init__(self):
@@ -22,3 +23,8 @@ class BlockchainNetwork:
     def get_web3_instance(self):
         return self.web3
 ```
+    def check_connection(self):
+        try:
+            self.web3.isConnected()
+        except:
+            raise ConnectionError("Failed to connect to the network")
