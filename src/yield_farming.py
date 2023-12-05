@@ -9,12 +9,30 @@ from web3 import Web3
 
 
 class YieldFarmingManager:
-    def __init__(self):
-        self.config = load_config()
-        self.web3 = Web3(Web3.HTTPProvider(self.config['blockchain_network']))
-        self.pancake_swap_contract = self.web3.eth.contract(address=self.config['pancake_swap_contract_address'], abi=json.loads(self.config['pancake_swap_contract_abi']))
+    """
+    A class to manage yield farming operations.
+    """
+    def __init__(self, config=load_config(), web3_provider=Web3.HTTPProvider, contract=Web3.eth.contract):
+        """
+        Initialize the YieldFarmingManager with the given configuration, web3 provider and contract.
+
+        Parameters:
+        - config (dict): The configuration for yield farming.
+        - web3_provider (Web3.HTTPProvider): The web3 provider to interact with the blockchain.
+        - contract (Web3.eth.contract): The contract to interact with PancakeSwap.
+        """
+        self.config = config
+        self.web3 = Web3(web3_provider(self.config['blockchain_network']))
+        self.pancake_swap_contract = contract(address=self.config['pancake_swap_contract_address'], abi=json.loads(self.config['pancake_swap_contract_abi']))
 
     def manage_yield_farming(self):
+        """
+        Manage yield farming based on the market data and price data.
+
+        Parameters:
+        - get_market_data (function): A function to get the market data.
+        - get_price_data (function): A function to get the price data.
+        """
         market_data = get_market_data()
         price_data = get_price_data()
 
@@ -28,15 +46,22 @@ class YieldFarmingManager:
                 self.remove_liquidity(pool)
 
     def should_add_liquidity(self, pool_data, pool_price):
-        # Example logic for when to add liquidity
-        price_difference_threshold = 0.05 # e.g., 5%
-        high_apy_threshold = 10 # e.g., 10%
+        """
+        Determine whether to add liquidity to the pool based on the pool data and pool price.
+    
+        Parameters:
+        - pool_data (dict): The data of the pool.
+        - pool_price (float): The price of the pool.
+        - price_difference_threshold (float): The threshold for the price difference to decide whether to add liquidity.
+        - high_apy_threshold (float): The threshold for the APY to decide whether to add liquidity.
+    
+        Returns:
+        - bool: True if should add liquidity, False otherwise.
+        """
         current_price_to_target_ratio = pool_price / pool_data['target_price']
         price_spread_significant = abs(1 - current_price_to_target_ratio) > price_difference_threshold
         apy_high = pool_data['apy'] > high_apy_threshold
-        if price_spread_significant or apy_high:
-            return True
-        return False
+        return price_spread_significant or apy_high
 
     def should_remove_liquidity(self, pool_data, pool_price):
         # Example logic for when to remove liquidity
