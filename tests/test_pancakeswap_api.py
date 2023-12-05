@@ -1,4 +1,4 @@
-```python
+
 import unittest
 from unittest.mock import patch
 from src import pancakeswap_api
@@ -17,7 +17,16 @@ class TestPancakeSwapAPI(unittest.TestCase):
         data = pancakeswap_api.get_market_data()
         self.assertEqual(data, {'liquidity': 1000000, 'price': 0.01, 'volume': 500000})
         mock_get.assert_called_once_with(pancakeswap_api.API_URL)
-
+        # Test for HTTPError
+        mock_get.side_effect = HTTPError()
+        with self.assertRaises(pancakeswap_api.MarketDataHTTPError):
+            pancakeswap_api.get_market_data()
+        mock_get.assert_called_with(pancakeswap_api.API_URL)
+        # Test for RequestException
+        mock_get.side_effect = RequestException()
+        with self.assertRaises(pancakeswap_api.MarketDataRequestError):
+            pancakeswap_api.get_market_data()
+        mock_get.assert_called_with(pancakeswap_api.API_URL)
     @patch('src.pancakeswap_api.requests.get')
     def test_get_price_data(self, mock_get):
         mock_response = mock_get.return_value
@@ -33,4 +42,3 @@ class TestPancakeSwapAPI(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-```
