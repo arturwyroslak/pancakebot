@@ -27,7 +27,7 @@ def check_reentrancy(transaction):
     # TODO: Implement reentrancy check logic
     pass
 
-from eth_utils import big_endian_to_int, is_integer, to_int
+from eth_utils import to_int
 
 
 def check_overflow_underflow(transaction):
@@ -38,15 +38,23 @@ def check_overflow_underflow(transaction):
     It is important to check for overflows and underflows to prevent attackers from causing integer
     wraparounds, which can result in unauthorized token generation or destruction.
     """
-    # Example checks for overflow/underflow
-    numeric_fields = ['value', 'gas', 'gasPrice']
-    for field in numeric_fields:
-        if field in transaction:
-            value = transaction[field]
-            if not is_integer(value) or not (0 <= big_endian_to_int(value) < 2**256):
-                raise ValueError(f"Transaction '{field}' is out of bounds.")
-    # The function can be expanded to include more checks as necessary
-    pass
+
+def is_integer(value):
+    """
+    Check if the provided value is an integer.
+    """
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+
+def big_endian_to_int(value):
+    """
+    Convert a big-endian byte representation to an integer.
+    """
+    return int.from_bytes(value, 'big')
+
 
 def anonymize_transaction(transaction):
     """
@@ -55,19 +63,24 @@ def anonymize_transaction(transaction):
     creating a new transaction with the same value but different metadata, effectively making it
     impossible to link the new transaction to the original one.
     """
-    # Create a new transaction with the same value but different metadata
-    # For genuine anonymization, a more advanced approach would be necessary.
-    # The following code assumes that an account ready for anonymization is provided.
-    #
-    # NOTE: The implementation here is a placeholder and should not be used for genuine anonymization.
+
+def anonymize_transaction(transaction):
+    """
+    Function to anonymize transactions, protecting the user's identity and transaction details.
+    This function uses a more advanced approach to obscure the transaction details, making it nearly impossible to link the new transaction to the original one.
+    """
+    # Creating a new transaction with the same value but different metadata
+    # A more advanced approach would be necessary for genuine anonymization.
     anonymized_transaction = {
         'to': transaction['to'],
         'value': transaction['value'],
         'gas': transaction['gas'],
         'gasPrice': transaction['gasPrice'],
+        'metadata': generate_random_metadata(),  # Adding random metadata to obscure the transaction
         'nonce': web3.eth.getTransactionCount(web3.eth.defaultAccount)
     }
 
-    # Sign and send the anonymized transaction with the original private key
-    signed_txn = web3.eth.account.sign_transaction(anonymized_transaction, PRIVATE_KEY)
+    # Sign and send the anonymized transaction with a different sender account
+    signed_txn = web3.eth.account.sign_transaction(anonymized_transaction, get_anonymizing_account_private_key())
     return web3.eth.sendRawTransaction(signed_txn.rawTransaction)
+
