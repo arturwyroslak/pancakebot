@@ -1,8 +1,9 @@
 ```python
-from web3 import Web3
 from src.config import load_config
 from src.pancakeswap_api import get_market_data
-from src.smart_contracts import execute_transaction
+from src.smart_contracts import TransactionError, execute_transaction
+from web3 import Web3
+
 
 class DeFiContracts:
     def __init__(self):
@@ -14,6 +15,10 @@ class DeFiContracts:
         contract = self.web3.eth.contract(address=contract_address, abi=contract_abi)
         function = contract.functions[function_name](*args)
         return execute_transaction(function)
+
+    def add_liquidity(self, token_address, amount):
+            print(f"Transaction failed: {e}")
+            return None
 
     def add_liquidity(self, token_address, amount):
         function_name = 'addLiquidity'
@@ -31,6 +36,10 @@ class DeFiContracts:
         function_name = 'unstake'
         return self.interact_with_defi_contracts(pool_address, self.config['staking_pool_abi'], function_name, amount)
 
+    def claim_rewards(self, pool_address):
+        function_name = 'getReward'
+        return self.interact_with_defi_contracts(pool_address, self.config['staking_pool_abi'], function_name)
+```
     def claim_rewards(self, pool_address):
         function_name = 'getReward'
         return self.interact_with_defi_contracts(pool_address, self.config['staking_pool_abi'], function_name)
