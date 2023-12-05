@@ -1,11 +1,19 @@
 ```python
-from web3 import Web3
+import logging
+
 from src.config import load_config
+from web3 import Web3, exceptions
+
 
 class TransactionFeeOptimizer:
     def __init__(self):
-        self.config = load_config()
-        self.web3 = Web3(Web3.HTTPProvider(self.config['blockchain_network']))
+        try:
+            self.config = load_config()
+            self.web3 = Web3(Web3.HTTPProvider(self.config['blockchain_network']))
+        except exceptions.InvalidAddress as e:
+            logging.error(f"Invalid blockchain network address in config: {e}")
+        except Exception as e:
+            logging.error(f"Error initializing TransactionFeeOptimizer: {e}")
 
     def get_gas_price(self):
         return self.web3.eth.gasPrice
@@ -36,3 +44,50 @@ if __name__ == "__main__":
     optimized_fee = optimizer.optimize_transaction_fee(transaction)
     print(f"Optimized transaction fee: {optimized_fee}")
 ```
+    }
+    optimized_fee = optimizer.optimize_transaction_fee(transaction)
+    print(f"Optimized transaction fee: {optimized_fee}")
+```
+        'nonce': 0,
+        'chainId': 0
+    }
+    optimized_fee = optimizer.optimize_transaction_fee(transaction)
+    print(f"Optimized transaction fee: {optimized_fee}")
+```
+        'nonce': 0,
+        'chainId': 0
+    }
+    optimized_fee = optimizer.optimize_transaction_fee(transaction)
+    print(f"Optimized transaction fee: {optimized_fee}")
+```
+    }
+    optimized_fee = optimizer.optimize_transaction_fee(transaction)
+    print(f"Optimized transaction fee: {optimized_fee}")
+```
+def test_transaction_fee_optimizer():
+    optimizer = TransactionFeeOptimizer()
+    transactions = [
+        {
+            'to': '0x0',
+            'value': 0,
+            'gas': 0,
+            'gasPrice': 0,
+            'nonce': 0,
+            'chainId': 0
+        },
+        {
+            'to': '0x1',
+            'value': 100,
+            'gas': 21000,
+            'gasPrice': 20,
+            'nonce': 1,
+            'chainId': 1
+        },
+        # Add more test transactions as needed
+    ]
+    for transaction in transactions:
+        optimized_fee = optimizer.optimize_transaction_fee(transaction)
+        print(f"Optimized transaction fee: {optimized_fee}")
+
+if __name__ == "__main__":
+    test_transaction_fee_optimizer()
