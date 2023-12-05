@@ -2,7 +2,6 @@ import pandas as pd
 from src.config import load_config
 from src.oracles import Oracle
 import sklearn
-import statsmodels.api as sm
 
 class Reporting:
     def __init__(self):
@@ -33,6 +32,7 @@ class Reporting:
         return historical_data
 
     def train_forecast_model(self, historical_data):
+        import sklearn
         # Placeholder code - actual implementation will depend on the model choice and data specifics
         # Assuming historical_data is a pandas DataFrame with columns: ['date', 'price']
         X = historical_data['date'].values.reshape(-1, 1)  # Feature (e.g., dates converted to ordinal)
@@ -44,8 +44,7 @@ class Reporting:
         model.fit(X, y)
         
         # Example using statsmodels (e.g., SARIMA model)
-        # import statsmodels.api as sm
-        # model = sm.tsa.statespace.SARIMAX(y, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
+        #         # model = sm.tsa.statespace.SARIMAX(y, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
         # model = model.fit()
 
         return model
