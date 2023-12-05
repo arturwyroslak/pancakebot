@@ -11,7 +11,6 @@ class TradingStrategies:
     def __init__(self):
         self.config = load_config()
         self.indicators = self.config.get('trading_algorithm', {})
-        self.config = load_config()
 
     def apply_trading_strategy(self, strategy):
         if strategy == 'strategy1':
@@ -22,33 +21,25 @@ class TradingStrategies:
             print("Invalid strategy")
 
     def strategy1(self):
-        market_data = get_market_data()
-        price_data = get_price_data()
-
-        # Implement your trading strategy here
-        # This is a placeholder for your trading strategy
-        # You can use market_data and price_data to make trading decisions
-
-        # Example: If the current price is lower than the average price, buy the token
-        if price_data['current_price'] < price_data['average_price']:
-            execute_transaction('buy', self.config['amount_to_buy'])
-
-    def strategy2(self):
-    def calculate_indicator(self, indicator_name, data):
-        if indicator_name == 'MACD':
-            macd, signal, hist = talib.MACD(data)
-            return macd, signal
-        elif indicator_name == 'RSI':
-            rsi = talib.RSI(data)
-            return rsi
-        else:
-            print("Invalid indicator")
+        try:
+            if indicator_name == 'MACD':
+                macd, signal, hist = talib.MACD(data)
+                return macd, signal
+            elif indicator_name == 'RSI':
+                rsi = talib.RSI(data)
+                return rsi
+            else:
+                print("Invalid indicator")
+                return None
+        except Exception as e:
+            print(f"Error calculating indicator {indicator_name}: {e}")
             return None
 
     def validate_price_data(self, price_data):
         if 'current_price' in price_data and 'average_price' in price_data:
             if isinstance(price_data['current_price'], (int, float)) and isinstance(price_data['average_price'], (int, float)):
-                return True
+                if price_data['current_price'] > 0 and price_data['average_price'] > 0:
+                    return True
         return False
 
     def strategy1(self):
@@ -71,7 +62,6 @@ class TradingStrategies:
             print("Hold")
         market_data = get_market_data()
         price_data = get_price_data()
-
         # Implement your trading strategy here
         # This is a placeholder for your trading strategy
         # You can use market_data and price_data to make trading decisions
@@ -93,6 +83,9 @@ if __name__ == "__main__":
             return
 
         rsi = self.calculate_indicator('RSI', market_data['close'])
+        if rsi is None:
+            print("Error calculating RSI")
+            return
 
         if rsi[-1] < 30:
             execute_transaction(self.config['contract_address'], 'buy', self.config['amount_to_buy'])
