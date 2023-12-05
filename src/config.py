@@ -48,10 +48,48 @@ BLOCKCHAIN_NETWORK = os.getenv('BLOCKCHAIN_NETWORK', "Binance_Smart_Chain")  # D
 MODULAR_DESIGN = os.getenv('MODULAR_DESIGN', True)  # Enable modular design
 
 # Load the configuration
-def load_config():
+
+import re
+import logging
+
+# Logging configuration
+LOG_LEVEL = logging.INFO
+LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+logging.basicConfig(filename='app.log', level=LOG_LEVEL, format=LOG_FORMAT)
+
+
+def is_valid_url(url):
+    # Simple regular expression for a typical HTTP(S) URL
+    regex = re.compile(
+        r'^(?:http|https)://'
+        r'\w+(\.\w+)+(:\d+)?'
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return re.match(regex, url) is not None
+
+def is_valid_hex_address(address):
+    # Simple regular expression for a typical hexadecimal address
+    regex = re.compile(r'^(0x)?[0-9a-fA-F]{40}$')
+    return re.match(regex, address) is not None
+
+
+import re
+
+def is_valid_url(url):
+    # Simple regular expression for a typical HTTP(S) URL
+    regex = re.compile(
+        r'^(?:http|https)://'
+        r'\w+(\.\w+)+(:\d+)?'
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return re.match(regex, url) is not None
+
+def is_valid_hex_address(address):
+    # Simple regular expression for a typical hexadecimal address
+    regex = re.compile(r'^(0x)?[0-9a-fA-F]{40}$')
+    return re.match(regex, address) is not None
+
 
 def load_config():
-    # This function loads the configuration from environment variables and returns a dictionary
     config = {
         "pancakeswap_api_url": PANCAKESWAP_API_URL,
         "oracle_api_url": ORACLE_API_URL,
